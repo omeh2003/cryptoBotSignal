@@ -17,12 +17,8 @@ class Broker:
         self._closed_trades: List[Trade] = []
 
     def describe(self):
-        open_trades_profit_loss = 0
-        for trade in self._trades:
-            open_trades_profit_loss += trade.profit_loss
-        closed_trades_profit_loss = 0
-        for trade in self._trades:
-            closed_trades_profit_loss += trade.profit_loss
+        open_trades_profit_loss = sum(trade.profit_loss for trade in self._trades)
+        closed_trades_profit_loss = sum(trade.profit_loss for trade in self._trades)
         return f'<Broker: Cash: {self._cash:.0f} Orders: {len(self._orders)} Trades: {len(self._trades)} Closed Trades: {len(self._closed_trades)} \
 Open Trades P&L: {open_trades_profit_loss:.0f} Closed Trades P&L: {closed_trades_profit_loss:.0f}>'
 
@@ -33,15 +29,14 @@ Open Trades P&L: {open_trades_profit_loss:.0f} Closed Trades P&L: {closed_trades
                      size: float = None,
                      limit: float = None,
                      stop: float = None):
-        size = size and float(size)
-        stop = stop and float(stop)
-        limit = limit and float(limit)
-        if position == Positions.LONG and side == Side.SELL:
-            for trade in reversed(self._trades):
+        size = size and size
+        stop = stop and stop
+        limit = limit and limit
+        for trade in reversed(self._trades):
+            if position == Positions.LONG and side == Side.SELL:
                 if trade.symbol == symbol and trade.position == position:
                     size = trade.size
-        elif position == Positions.SHORT and side == Side.BUY:
-            for trade in reversed(self._trades):
+            elif position == Positions.SHORT and side == Side.BUY:
                 if trade.symbol == symbol and trade.position == position:
                     size = trade.size
         if size is None:
@@ -63,7 +58,7 @@ Open Trades P&L: {open_trades_profit_loss:.0f} Closed Trades P&L: {closed_trades
             order.set_price(current_price)
             if order.status == OrderStatus.FILLED:
                 if (order.position == Positions.LONG and order.side == Side.BUY) or \
-                        (order.position == Positions.SHORT and order.side == Side.SELL):
+                            (order.position == Positions.SHORT and order.side == Side.SELL):
                     trade = Trade(order.symbol, order.position, order.side, order.size, order.price, self._price_loader)
                     self._trades.insert(0, trade)
                     logger.info(f"Opened new trade {trade.describe()}")
@@ -74,7 +69,7 @@ Open Trades P&L: {open_trades_profit_loss:.0f} Closed Trades P&L: {closed_trades
                     self._orders.remove(order)
                     logger.info(f"Removed order {order.describe()}")
                 elif (order.position == Positions.LONG and order.side == Side.SELL) or \
-                        (order.position == Positions.SHORT and order.side == Side.BUY):
+                            (order.position == Positions.SHORT and order.side == Side.BUY):
                     for trade in reversed(self._trades):
                         if trade.position == order.position and trade.side != order.side and trade.size == order.size:
                             trade.set_exit_price(order.price)

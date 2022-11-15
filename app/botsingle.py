@@ -27,7 +27,7 @@ class OrderStatus(Enum):
 
 
 def setup_logging(self):
-    today = datetime.datetime.today()
+    today = datetime.datetime.now()
     today_str = today.strftime("%Y-%m-%d")
     log_file_name = f"{today_str}_bot_log.txt"
     log_full_path = os.path.join(LOG_DIR, log_file_name)

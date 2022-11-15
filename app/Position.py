@@ -16,12 +16,11 @@ class Position:
 
     @property
     def size(self) -> float:
-        total_size = 0
-        for trade in self._broker.trades:
-            if trade.symbol != self.symbol or trade.position != self._position:
-                continue
-            total_size += trade.size
-        return total_size
+        return sum(
+            trade.size
+            for trade in self._broker.trades
+            if trade.symbol == self.symbol and trade.position == self._position
+        )
 
     @property
     def profit_loss(self) -> float:
