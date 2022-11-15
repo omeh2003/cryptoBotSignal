@@ -33,8 +33,13 @@ class GetData:
     def updatedate(self):
         self.values = [[self.exchange.iso8601(int(o[0]))] + o[1:] for o in self.ohlcvs]
         self.first = self.values[0]
-        self.keys = list(self.first.keys()) if isinstance(self.first, dict) else range(0, len(self.first))
-        self.widths = [max([len(str(v[k])) for v in self.values]) for k in self.keys]
+        self.keys = (
+            list(self.first.keys())
+            if isinstance(self.first, dict)
+            else range(len(self.first))
+        )
+
+        self.widths = [max(len(str(v[k])) for v in self.values) for k in self.keys]
         self.DataFrameMarket = pd.DataFrame(self.values,
                                             columns=['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Close time',
                                                      'Quote asset volume',
@@ -61,7 +66,7 @@ class GetData:
             self.exchange.load_markets()
             self.ohlcvs = self.exchange.fapiPublic_get_continuousklines(self.params)
         except Exception as e:
-            print(type(e).__name__, str(e))
+            print(type(e).__name__, e)
 
     def renew(self):
         self.updatemarket()

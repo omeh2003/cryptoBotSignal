@@ -21,7 +21,7 @@ class Bot:
         self.setup_logging()
 
     def setup_logging(self):
-        today = datetime.datetime.today()
+        today = datetime.datetime.now()
         today_str = today.strftime("%Y-%m-%d")
         log_file_name = f"{today_str}_bot_log.txt"
         log_full_path = os.path.join(os.path.abspath(os.path.curdir), log_file_name)
@@ -32,7 +32,7 @@ class Bot:
         logger.add(log_full_path, format="{time:YYYY-MM-DD HH:mm:ss} {level} {message}")
 
     def start(self):
-        logger.info(f"Starting bot")
+        logger.info("Starting bot")
         self._is_running = True
         while self._is_running:
             symbols = self._config.symbols
@@ -45,5 +45,5 @@ class Bot:
             time.sleep(self._config.data_fetch_interval)
 
     def stop(self):
-        logger.info(f"Stopping bot")
+        logger.info("Stopping bot")
         self._is_running = True
